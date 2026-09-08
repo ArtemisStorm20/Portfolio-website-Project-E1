@@ -9,7 +9,7 @@
     </head>
     <body>
         <div class="page-shell">
-            <div class="utility-bar"><span>AMY SOFTWARE STUDIO</span><span>{{ app()->getLocale() === 'nl' ? 'Websites &amp; digitale producten met aandacht gemaakt' : 'Websites &amp; digital products made with care' }}</span><span class="utility-social">f&nbsp;&nbsp;in&nbsp;&nbsp;p</span></div>
+            <div class="utility-bar"><span>AMY SOFTWARE STUDIO</span><span>{{ app()->getLocale() === 'nl' ? 'Gemaakt met Liefde' : 'Assembled with Love' }}</span><span class="utility-social">f&nbsp;&nbsp;in&nbsp;&nbsp;p</span></div>
             <header class="site-header">
                 <a class="brand" href="{{ route('home') }}" aria-label="Amy Software home"><span class="brand-script">Amy</span><span class="brand-subtitle">software<br>development</span></a>
                 <div class="language-switcher" aria-label="Language switcher"><a class="{{ app()->getLocale() === 'nl' ? 'is-active' : '' }}" href="{{ route('language.switch', 'nl') }}">NL</a><span>/</span><a class="{{ app()->getLocale() === 'en' ? 'is-active' : '' }}" href="{{ route('language.switch', 'en') }}">EN</a></div>
@@ -29,7 +29,7 @@
 
                 <section class="newsletter" id="contact"><div><p class="hero-script">Stay in touch</p><h2>{{ app()->getLocale() === 'nl' ? 'Laten we iets moois maken.' : 'Let us make something lovely.' }}</h2></div><form><label for="email">{{ app()->getLocale() === 'nl' ? 'Af en toe een update over nieuwe projecten.' : 'Occasional updates about new projects.' }}</label><div><input id="email" type="email" placeholder="Your email address"><button type="submit">{{ app()->getLocale() === 'nl' ? 'Aanmelden' : 'Join' }} &rarr;</button></div></form></section>
             </main>
-            <footer class="site-footer"><span>AMY SOFTWARE STUDIO</span><span>{{ app()->getLocale() === 'nl' ? 'Gebouwd met code &amp; karakter' : 'Built with code &amp; character' }}</span><span>&copy; {{ date('Y') }}</span></footer>
+            <footer class="site-footer"><span>AMY SOFTWARE STUDIO</span><span>{{ app()->getLocale() === 'nl' ? 'Gebouwd met code en liefde' : 'Built with code and love' }}</span><span>&copy; {{ date('Y') }}</span></footer>
         </div>
     </body>
 </html>
