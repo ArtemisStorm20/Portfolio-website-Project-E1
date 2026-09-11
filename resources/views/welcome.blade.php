@@ -12,7 +12,16 @@
             <div class="utility-bar"><span>AMY SOFTWARE STUDIO</span><span>{{ app()->getLocale() === 'nl' ? 'Gemaakt met Liefde' : 'Assembled with Love' }}</span><span class="utility-social">f&nbsp;&nbsp;in&nbsp;&nbsp;p</span></div>
             <header class="site-header">
                 <a class="brand" href="{{ route('home') }}" aria-label="Amy Software home"><span class="brand-script">Amy</span><span class="brand-subtitle">software<br>development</span></a>
-                <div class="language-switcher" aria-label="Language switcher"><a class="{{ app()->getLocale() === 'nl' ? 'is-active' : '' }}" href="{{ route('language.switch', 'nl') }}">NL</a><span>/</span><a class="{{ app()->getLocale() === 'en' ? 'is-active' : '' }}" href="{{ route('language.switch', 'en') }}">EN</a></div>
+                <div class="header-actions">
+                    @auth
+                        @if (auth()->user()->is_admin)
+                            <a class="admin-link" href="{{ route('admin.projects.index') }}">Beheer</a>
+                        @endif
+                    @else
+                        <a class="admin-link" href="{{ route('login') }}">Inloggen</a>
+                    @endauth
+                    <div class="language-switcher" aria-label="Language switcher"><a class="{{ app()->getLocale() === 'nl' ? 'is-active' : '' }}" href="{{ route('language.switch', 'nl') }}">NL</a><span>/</span><a class="{{ app()->getLocale() === 'en' ? 'is-active' : '' }}" href="{{ route('language.switch', 'en') }}">EN</a></div>
+                </div>
             </header>
             <nav class="site-nav" aria-label="{{ app()->getLocale() === 'nl' ? 'Hoofdnavigatie' : 'Main navigation' }}"><a href="{{ route('home') }}">Home</a><a href="#about">{{ app()->getLocale() === 'nl' ? 'Over mij' : 'About' }}</a><a href="#work">{{ app()->getLocale() === 'nl' ? 'Portfolio' : 'Portfolio' }}</a><a href="#contact">{{ app()->getLocale() === 'nl' ? 'Contact' : 'Contact' }}</a></nav>
 
@@ -23,7 +32,26 @@
 
                 <section class="welcome-band"><div class="welcome-mark">AMY<br><span>SOFTWARE</span></div><div><p class="eyebrow">{{ app()->getLocale() === 'nl' ? 'Een creatieve developer' : 'A creative developer' }}</p><h2>{{ app()->getLocale() === 'nl' ? 'Websites met een zacht hart en een sterke basis.' : 'Websites with a soft heart and a strong foundation.' }}</h2></div><p>{{ app()->getLocale() === 'nl' ? 'Van frontend tot database: ik vertaal jouw verhaal naar een online plek die prettig werkt en helemaal als jou voelt.' : 'From frontend to database: I translate your story into an online space that works beautifully and feels completely like you.' }}</p></section>
 
-                <section class="feature-links" id="work"><a class="feature feature-pink" href="#contact"><span>{{ app()->getLocale() === 'nl' ? 'Bekijk de' : 'See the' }}</span><strong>Portfolio</strong><i class="line-flower"></i></a><a class="feature feature-cream" href="#about"><span>{{ app()->getLocale() === 'nl' ? 'Lees mijn' : 'Read my' }}</span><strong>Story</strong><i class="line-spark">*</i></a><a class="feature feature-rose" href="#contact"><span>{{ app()->getLocale() === 'nl' ? 'Start een' : 'Start a' }}</span><strong>Project</strong><i class="line-heart">&hearts;</i></a></section>
+                <section class="feature-links" id="work"><a class="feature feature-pink" href="#projects"><span>{{ app()->getLocale() === 'nl' ? 'Bekijk de' : 'See the' }}</span><strong>Portfolio</strong><i class="line-flower"></i></a><a class="feature feature-cream" href="#about"><span>{{ app()->getLocale() === 'nl' ? 'Lees mijn' : 'Read my' }}</span><strong>Story</strong><i class="line-spark">*</i></a><a class="feature feature-rose" href="#contact"><span>{{ app()->getLocale() === 'nl' ? 'Start een' : 'Start a' }}</span><strong>Project</strong><i class="line-heart">&hearts;</i></a></section>
+
+                <section class="projects-section" id="projects">
+                    <p class="eyebrow">02 / {{ app()->getLocale() === 'nl' ? 'Portfolio' : 'Portfolio' }}</p>
+                    <h2>{{ app()->getLocale() === 'nl' ? 'Werk waar ik trots op ben.' : 'Work I am proud of.' }}</h2>
+                    <div class="projects-grid">
+                        @forelse ($projects as $project)
+                            <article class="project-card">
+                                <div class="project-gallery">
+                                    @foreach ($project->images as $image)
+                                        <img src="{{ asset('storage/'.$image->path) }}" alt="{{ $project->title }}">
+                                    @endforeach
+                                </div>
+                                <div class="project-copy"><h3>{{ $project->title }}</h3><p>{{ $project->description }}</p></div>
+                            </article>
+                        @empty
+                            <p class="project-empty">{{ app()->getLocale() === 'nl' ? 'Binnenkort verschijnt hier nieuw werk.' : 'New work will appear here soon.' }}</p>
+                        @endforelse
+                    </div>
+                </section>
 
                 <section class="about-section" id="about"><div class="about-image"><span class="about-initial">A</span><span class="about-caption">code with<br>personality</span></div><div class="about-copy"><p class="eyebrow">01 / {{ app()->getLocale() === 'nl' ? 'Over Amy' : 'About Amy' }}</p><h2>{{ app()->getLocale() === 'nl' ? 'Hallo, ik ben Amy.' : 'Hello, I am Amy.' }}</h2><p>{{ app()->getLocale() === 'nl' ? 'Ik ben een software developer die graag techniek en creativiteit samenbrengt. Ik word enthousiast van een duidelijke gebruikerservaring, nette code en projecten waar ruimte is voor een eigen sfeer.' : 'I am a software developer who loves bringing technology and creativity together. I enjoy clear user experiences, tidy code and projects with room for a distinct sense of atmosphere.' }}</p><a class="text-link" href="#contact">{{ app()->getLocale() === 'nl' ? 'Meer over mij' : 'More about me' }} &rarr;</a></div></section>
 
