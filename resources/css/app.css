@@ -212,7 +212,7 @@
 .projects-section { padding: 20px 0 55px; }
 .projects-section > h2 { margin: 0 0 24px; font-family: var(--serif); font-size: clamp(30px, 4vw, 48px); font-weight: 500; }
 .projects-grid { display: grid; gap: 28px; }
-.project-card { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; padding: 24px 0; border-top: 1px solid var(--line); }
+.project-card { display: grid; grid-template-columns: .9fr 1.1fr; gap: 28px; padding: 24px 0; border-top: 1px solid var(--line); }
 .project-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .project-gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .project-copy h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 34px; font-weight: 500; }
