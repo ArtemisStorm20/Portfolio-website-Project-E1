@@ -234,13 +234,22 @@
 .admin-project-list article p:not(.project-number) { max-width: 520px; margin: 0; color: var(--muted); }
 .project-number { margin: 0 0 2px; color: #ad777a; font-size: 10px; letter-spacing: .16em; }
 .admin-project-list small { align-self: end; color: #a17e80; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.project-admin-actions { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; justify-content: end; }
+.project-admin-actions .text-link, .delete-link { border: 0; border-bottom: 1px solid var(--rose); background: transparent; color: #a25f68; cursor: pointer; font: inherit; font-size: 12px; }
+.project-admin-actions form { margin: 0; }
+.delete-link { color: #9b5b61; }
+.edit-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 5px 0 10px; }
+.edit-image { position: relative; margin: 0 !important; cursor: pointer; }
+.edit-image img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.edit-image span { display: block; padding: 7px 0; color: var(--muted); font-size: 11px; letter-spacing: .03em; text-transform: none; }
+.form-hint { color: var(--muted); font-size: 11px; letter-spacing: 0; text-transform: none; }
 .admin-empty { padding: 55px 25px; background: var(--cream); color: var(--muted); text-align: center; }
 .admin-empty p { margin: 5px 0; font-family: var(--serif); font-size: 25px; color: var(--ink); }
 .admin-empty span:last-child { font-size: 12px; }
 .empty-mark { display: block; color: #ad777a; font-family: var(--script); font-size: 44px; line-height: 1; }
 .admin-page .site-footer { margin-top: 60px; }
 @media (max-width: 700px) { .project-card { grid-template-columns: 1fr; } }
-@media (max-width: 700px) { .admin-heading { display: block; } .admin-heading .button { margin-top: 22px; } .admin-header { min-height: 120px; } .admin-label { font-size: 8px; } .admin-project-list article { display: block; } .admin-project-list small { display: block; margin-top: 15px; } }
+@media (max-width: 700px) { .admin-heading { display: block; } .admin-heading .button { margin-top: 22px; } .admin-header { min-height: 120px; } .admin-label { font-size: 8px; } .admin-project-list article { display: block; } .admin-project-list small { display: block; margin-top: 15px; } .project-admin-actions { justify-content: start; margin-top: 18px; } .edit-gallery { grid-template-columns: repeat(2, 1fr); } }
 .feature {
     position: relative;
     min-height: 170px;
