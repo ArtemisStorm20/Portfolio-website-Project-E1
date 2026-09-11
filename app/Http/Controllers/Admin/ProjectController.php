@@ -28,7 +28,7 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'images' => ['required', 'array', 'min:1'],
+            'images' => ['required', 'array', 'min:1', 'max:5'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
@@ -56,10 +56,14 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project): RedirectResponse
     {
+        $removeIds = $request->input('remove_images', []);
+        $remainingImageCount = $project->images()->whereNotIn('id', $removeIds)->count();
+        $maxNewImages = max(0, 5 - $remainingImageCount);
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'images' => ['nullable', 'array'],
+            'images' => ['nullable', 'array', "max:{$maxNewImages}"],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'remove_images' => ['nullable', 'array'],
             'remove_images.*' => ['integer'],
@@ -70,7 +74,6 @@ class ProjectController extends Controller
             'description' => $validated['description'],
         ]);
 
-        $removeIds = $validated['remove_images'] ?? [];
         $imagesToRemove = $project->images()->whereIn('id', $removeIds)->get();
         foreach ($imagesToRemove as $image) {
             Storage::disk('public')->delete($image->path);

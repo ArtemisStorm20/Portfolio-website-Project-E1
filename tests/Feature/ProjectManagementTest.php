@@ -20,18 +20,37 @@ class ProjectManagementTest extends TestCase
         $response = $this->actingAs($admin)->post(route('admin.projects.store'), [
             'title' => 'Mijn nieuwe project',
             'description' => 'Een korte projectbeschrijving.',
-            'images' => [
-                UploadedFile::fake()->image('project-one.jpg'),
-                UploadedFile::fake()->image('project-two.jpg'),
-            ],
+            'images' => array_map(
+                fn (int $number) => UploadedFile::fake()->image("project-{$number}.jpg"),
+                range(1, 5)
+            ),
         ]);
 
         $response->assertRedirect(route('admin.projects.index'));
         $this->assertDatabaseHas('projects', ['title' => 'Mijn nieuwe project']);
-        $this->assertDatabaseCount('project_images', 2);
+        $this->assertDatabaseCount('project_images', 5);
         $this->assertTrue(Storage::disk('public')->exists(
             \App\Models\ProjectImage::first()->path
         ));
+    }
+
+    public function test_an_admin_cannot_create_a_project_with_more_than_five_images(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $response = $this->actingAs($admin)->post(route('admin.projects.store'), [
+            'title' => 'Te veel afbeeldingen',
+            'description' => 'Dit project mag niet worden opgeslagen.',
+            'images' => array_map(
+                fn (int $number) => UploadedFile::fake()->image("project-{$number}.jpg"),
+                range(1, 6)
+            ),
+        ]);
+
+        $response->assertSessionHasErrors('images');
+        $this->assertDatabaseCount('projects', 0);
+        $this->assertDatabaseCount('project_images', 0);
     }
 
     public function test_a_guest_cannot_open_project_management(): void
@@ -62,6 +81,30 @@ class ProjectManagementTest extends TestCase
         $this->assertDatabaseHas('projects', ['title' => 'Nieuwe titel', 'description' => 'Nieuwe beschrijving']);
         $this->assertDatabaseCount('project_images', 1);
         $this->assertFalse(Storage::disk('public')->exists($oldPath));
+    }
+
+    public function test_an_admin_cannot_add_images_when_a_project_already_has_five(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin)->post(route('admin.projects.store'), [
+            'title' => 'Vol project',
+            'description' => 'Dit project heeft al vijf afbeeldingen.',
+            'images' => array_map(
+                fn (int $number) => UploadedFile::fake()->image("existing-{$number}.jpg"),
+                range(1, 5)
+            ),
+        ]);
+        $project = \App\Models\Project::first();
+
+        $response = $this->actingAs($admin)->put(route('admin.projects.update', $project), [
+            'title' => $project->title,
+            'description' => $project->description,
+            'images' => [UploadedFile::fake()->image('sixth.jpg')],
+        ]);
+
+        $response->assertSessionHasErrors('images');
+        $this->assertDatabaseCount('project_images', 5);
     }
 
     public function test_an_admin_can_delete_a_project_and_its_images(): void
