@@ -25,6 +25,7 @@ class ProjectController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // Een project heeft minimaal een afbeelding en maximaal vijf afbeeldingen.
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
@@ -38,6 +39,7 @@ class ProjectController extends Controller
         ]);
 
         foreach ($request->file('images') as $sortOrder => $image) {
+            // Bewaar alleen het bestandspad; de bestanden zelf komen op de public disk.
             $project->images()->create([
                 'path' => $image->store('projects', 'public'),
                 'sort_order' => $sortOrder,
@@ -57,6 +59,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project): RedirectResponse
     {
         $removeIds = $request->input('remove_images', []);
+        // Nieuwe afbeeldingen mogen het totaal van vijf niet overschrijden.
         $remainingImageCount = $project->images()->whereNotIn('id', $removeIds)->count();
         $maxNewImages = max(0, 5 - $remainingImageCount);
 
@@ -76,6 +79,7 @@ class ProjectController extends Controller
 
         $imagesToRemove = $project->images()->whereIn('id', $removeIds)->get();
         foreach ($imagesToRemove as $image) {
+            // Verwijder zowel het fysieke bestand als de databasevermelding.
             Storage::disk('public')->delete($image->path);
             $image->delete();
         }
@@ -93,6 +97,7 @@ class ProjectController extends Controller
 
     public function destroy(Project $project): RedirectResponse
     {
+        // Ruim eerst de afbeeldingen op voordat het project uit de database verdwijnt.
         foreach ($project->images as $image) {
             Storage::disk('public')->delete($image->path);
         }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/language/{locale}', function (string $locale) {
+    // Alleen Nederlands en Engels zijn toegestane talen.
     abort_unless(in_array($locale, ['nl', 'en'], true), 404);
 
     session(['locale' => $locale]);
@@ -29,6 +30,7 @@ Route::get('/portfolio', function () {
 Route::middleware('guest')->group(function () {
     Route::view('/login', 'auth.login')->name('login');
     Route::post('/login', function (Request $request) {
+        // Valideer de invoer voordat Laravel probeert in te loggen.
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -45,6 +47,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', function (Request $request) {
+    // Beveilig de logout tegen hergebruik van de oude sessie en CSRF-token.
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
@@ -52,6 +55,7 @@ Route::post('/logout', function (Request $request) {
     return redirect()->route('home');
 })->middleware('auth')->name('logout');
 
+// Alleen ingelogde beheerders mogen projecten beheren.
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
