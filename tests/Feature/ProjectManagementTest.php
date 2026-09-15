@@ -119,11 +119,29 @@ class ProjectManagementTest extends TestCase
         $project = \App\Models\Project::with('images')->first();
         $path = $project->images->first()->path;
 
-        $this->actingAs($admin)->delete(route('admin.projects.destroy', $project))
+        $this->actingAs($admin)->delete(route('admin.projects.destroy', $project), [
+            'project_name_confirmation' => 'Te verwijderen',
+        ])
             ->assertRedirect(route('admin.projects.index'));
 
         $this->assertDatabaseMissing('projects', ['id' => $project->id]);
         $this->assertDatabaseCount('project_images', 0);
         $this->assertFalse(Storage::disk('public')->exists($path));
+    }
+
+    public function test_an_admin_cannot_delete_a_project_with_an_incorrect_name(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $project = \App\Models\Project::create([
+            'title' => 'Mijn project',
+            'description' => 'Beschrijving',
+        ]);
+
+        $response = $this->actingAs($admin)->delete(route('admin.projects.destroy', $project), [
+            'project_name_confirmation' => 'Verkeerde naam',
+        ]);
+
+        $response->assertSessionHasErrors('project_name_confirmation');
+        $this->assertDatabaseHas('projects', ['id' => $project->id]);
     }
 }

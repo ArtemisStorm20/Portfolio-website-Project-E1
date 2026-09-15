@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -95,15 +96,27 @@ class ProjectController extends Controller
         return redirect()->route('admin.projects.index')->with('success', 'Project bijgewerkt.');
     }
 
-    public function destroy(Project $project): RedirectResponse
+    public function destroy(Request $request, Project $project): RedirectResponse
     {
-        // Ruim eerst de afbeeldingen op voordat het project uit de database verdwijnt.
+        $request->validate([
+            'project_name_confirmation' => [
+                'required',
+                'string',
+                Rule::in([$project->title]),
+            ],
+        ], [
+            'project_name_confirmation.in' =>
+                'De ingevoerde projectnaam komt niet overeen.',
+        ]);
+
         foreach ($project->images as $image) {
             Storage::disk('public')->delete($image->path);
         }
 
         $project->delete();
 
-        return redirect()->route('admin.projects.index')->with('success', 'Project verwijderd.');
+        return redirect()
+            ->route('admin.projects.index')
+            ->with('success', 'Project verwijderd.');
     }
 }
