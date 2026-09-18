@@ -26,6 +26,9 @@
                             </p>
                             <h2>{{ $project->title }}
                                 </h2>
+                                @if ($project->tags->isNotEmpty())
+                                    <p class="project-tags">@foreach ($project->tags as $tag)<span>{{ $tag->name }}</span>@endforeach</p>
+                                @endif
                                 <p>{{ $project->description }}
                                     </p>
                                 </div>

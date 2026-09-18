@@ -22,6 +22,8 @@
             <input id="title" name="title" value="{{ old('title') }}" required>
             <label for="description">Beschrijving</label>
             <textarea id="description" name="description" rows="7" required>{{ old('description') }}</textarea>
+            <label for="tags">Tags <span class="form-hint">(gescheiden door komma's)</span></label>
+            <input id="tags" name="tags" value="{{ old('tags') }}" placeholder="Webdesign, Laravel, E-commerce">
             <label for="images">Afbeeldingen <span class="form-hint">(maximaal 5 foto's)</span></label>
             <input id="images" type="file" name="images[]" accept="image/jpeg,image/png,image/webp" data-max-files="5" multiple required>
             <button class="button" type="submit">Project opslaan &rarr;</button>

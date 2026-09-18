@@ -21,6 +21,8 @@
                 <input id="title" name="title" value="{{ old('title', $project->title) }}" required>
                 <label for="description">Beschrijving</label>
                 <textarea id="description" name="description" rows="7" required>{{ old('description', $project->description) }}</textarea>
+                <label for="tags">Tags <span class="form-hint">(gescheiden door komma's)</span></label>
+                <input id="tags" name="tags" value="{{ old('tags', $project->tags->pluck('name')->implode(', ')) }}" placeholder="Webdesign, Laravel, E-commerce">
                 @if ($project->images->isNotEmpty())
                     <label>Bestaande afbeeldingen</label>
                     <div class="edit-gallery">
