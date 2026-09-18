@@ -144,4 +144,54 @@ class ProjectManagementTest extends TestCase
         $response->assertSessionHasErrors('project_name_confirmation');
         $this->assertDatabaseHas('projects', ['id' => $project->id]);
     }
+
+    public function test_an_admin_can_create_and_update_project_tags(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)->post(route('admin.projects.store'), [
+            'title' => 'Tagged project',
+            'description' => 'Beschrijving',
+            'tags' => 'Webdesign, Laravel, Webdesign',
+            'images' => [UploadedFile::fake()->image('tagged.jpg')],
+        ]);
+
+        $project = \App\Models\Project::with('tags')->first();
+        $this->assertCount(2, $project->tags);
+        $this->assertDatabaseHas('tags', ['name' => 'Laravel']);
+
+        $this->actingAs($admin)->put(route('admin.projects.update', $project), [
+            'title' => $project->title,
+            'description' => $project->description,
+            'tags' => 'PHP',
+        ]);
+
+        $this->assertDatabaseMissing('project_tag', [
+            'project_id' => $project->id,
+            'tag_id' => \App\Models\Tag::where('name', 'Laravel')->value('id'),
+        ]);
+        $this->assertDatabaseHas('tags', ['name' => 'PHP']);
+        $this->assertSame('PHP', $project->fresh()->tags->first()->name);
+    }
+
+    public function test_visitors_can_filter_projects_by_tag(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['is_admin' => true]);
+        $payload = fn (string $title, string $tags) => [
+            'title' => $title,
+            'description' => 'Beschrijving',
+            'tags' => $tags,
+            'images' => [UploadedFile::fake()->image(strtolower($title).'.jpg')],
+        ];
+
+        $this->actingAs($admin)->post(route('admin.projects.store'), $payload('Laravel project', 'Laravel'));
+        $this->actingAs($admin)->post(route('admin.projects.store'), $payload('Design project', 'Design'));
+
+        $this->get(route('portfolio', ['tag' => 'laravel']))
+            ->assertOk()
+            ->assertSee('Laravel project')
+            ->assertDontSee('Design project');
+    }
 }
