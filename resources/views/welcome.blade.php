@@ -37,6 +37,12 @@
                 <section class="projects-section" id="projects">
                     <p class="eyebrow">02 / {{ app()->getLocale() === 'nl' ? 'Portfolio' : 'Portfolio' }}</p>
                     <h2>{{ app()->getLocale() === 'nl' ? 'Werk waar ik trots op ben.' : 'Work I am proud of.' }}</h2>
+                    <div class="tag-filter" aria-label="Filter projecten op tag">
+                        <a class="tag-filter-link {{ !$activeTag ? 'is-active' : '' }}" href="{{ route('portfolio') }}">Alle</a>
+                        @foreach ($tags as $tag)
+                            <a class="tag-filter-link {{ $activeTag === $tag->slug ? 'is-active' : '' }}" href="{{ route('portfolio', ['tag' => $tag->slug]) }}">{{ $tag->name }}</a>
+                        @endforeach
+                    </div>
                     <div class="projects-grid">
                         @forelse ($projects as $project)
                             <article class="project-card">
@@ -45,7 +51,7 @@
                                         <img src="{{ asset('storage/'.$image->path) }}" alt="{{ $project->title }}">
                                     @endforeach
                                 </div>
-                                <div class="project-copy"><h3>{{ $project->title }}</h3><p>{{ $project->description }}</p></div>
+                                <div class="project-copy"><h3>{{ $project->title }}</h3><div class="project-tags">@foreach ($project->tags as $tag)<span>{{ $tag->name }}</span>@endforeach</div><p>{{ $project->description }}</p></div>
                             </article>
                         @empty
                             <p class="project-empty">{{ app()->getLocale() === 'nl' ? 'Binnenkort verschijnt hier nieuw werk.' : 'New work will appear here soon.' }}</p>
