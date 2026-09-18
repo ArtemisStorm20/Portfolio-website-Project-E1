@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -30,6 +32,7 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'tags' => ['nullable', 'string', 'max:1000'],
             'images' => ['required', 'array', 'min:1', 'max:5'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
@@ -47,12 +50,14 @@ class ProjectController extends Controller
             ]);
         }
 
+        $project->tags()->sync($this->tagsFromInput($validated['tags'] ?? ''));
+
         return redirect()->route('admin.projects.index')->with('success', 'Project toegevoegd.');
     }
 
     public function edit(Project $project): View
     {
-        $project->load('images');
+        $project->load(['images', 'tags']);
 
         return view('admin.projects.edit', compact('project'));
     }
@@ -67,6 +72,7 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'tags' => ['nullable', 'string', 'max:1000'],
             'images' => ['nullable', 'array', "max:{$maxNewImages}"],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'remove_images' => ['nullable', 'array'],
@@ -77,6 +83,7 @@ class ProjectController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
         ]);
+        $project->tags()->sync($this->tagsFromInput($validated['tags'] ?? ''));
 
         $imagesToRemove = $project->images()->whereIn('id', $removeIds)->get();
         foreach ($imagesToRemove as $image) {
@@ -94,6 +101,23 @@ class ProjectController extends Controller
         }
 
         return redirect()->route('admin.projects.index')->with('success', 'Project bijgewerkt.');
+    }
+
+    private function tagsFromInput(string $input): array
+    {
+        return collect(explode(',', $input))
+            ->map(fn (string $tag) => trim($tag))
+            ->filter()
+            ->unique(fn (string $tag) => Str::lower($tag))
+            ->mapWithKeys(function (string $name): array {
+                $tag = Tag::firstOrCreate(
+                    ['slug' => Str::slug($name)],
+                    ['name' => $name]
+                );
+
+                return [$tag->id => []];
+            })
+            ->all();
     }
 
     public function destroy(Request $request, Project $project): RedirectResponse
