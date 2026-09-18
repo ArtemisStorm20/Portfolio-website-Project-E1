@@ -218,7 +218,9 @@
 .project-copy h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 34px; font-weight: 500; }
 .project-copy p, .project-empty { margin: 0; color: var(--muted); }
 .tag-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 25px; }
-.tag-filter-link, .project-tags span { padding: 5px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.tag-filter-link, .project-tags span { padding: 5px 10px; border: 1px solid var(--line); background: var(--cream); color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.tag-filter-link { transition: background .2s ease, border-color .2s ease, color .2s ease; }
+.tag-filter-link:hover { border-color: var(--rose); background: var(--rose-light); color: var(--ink); }
 .tag-filter-link.is-active { background: var(--ink); border-color: var(--ink); color: white; }
 .project-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .admin-project-list .project-tags { margin: 0 0 8px; }
