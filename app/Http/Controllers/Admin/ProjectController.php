@@ -28,7 +28,8 @@ class ProjectController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        // Een project heeft minimaal een afbeelding en maximaal vijf afbeeldingen.
+        // Een project moet minimaal één afbeelding hebben en mag maximaal vijf afbeeldingen bevatten.
+        // In de database wordt alleen het pad naar de afbeelding opgeslagen. De afbeelding zelf wordt beheerd en opgeslagen via de storage-disk.
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
@@ -43,7 +44,8 @@ class ProjectController extends Controller
         ]);
 
         foreach ($request->file('images') as $sortOrder => $image) {
-            // Bewaar alleen het bestandspad; de bestanden zelf komen op de public disk.
+            // Alleen het bestandspad wordt opgeslagen in de database. De bestanden zelf worden opgeslagen op de public disk.
+            // De sorteerpositie wordt automatisch bepaald door de volgorde van de geüploade bestanden.
             $project->images()->create([
                 'path' => $image->store('projects', 'public'),
                 'sort_order' => $sortOrder,
@@ -65,7 +67,8 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project): RedirectResponse
     {
         $removeIds = $request->input('remove_images', []);
-        // Nieuwe afbeeldingen mogen het totaal van vijf niet overschrijden.
+        // Bij het toevoegen van nieuwe afbeeldingen mag het totaal niet boven de vijf afbeeldingen uitkomen.
+        // Na het verwijderen van afbeeldingen wordt opnieuw berekend hoeveel afbeeldingen er nog toegevoegd kunnen worden. Hierdoor blijft de limiet van vijf afbeeldingen ook bij het aanpassen van een bestaand project hetzelfde.
         $remainingImageCount = $project->images()->whereNotIn('id', $removeIds)->count();
         $maxNewImages = max(0, 5 - $remainingImageCount);
 
@@ -87,7 +90,8 @@ class ProjectController extends Controller
 
         $imagesToRemove = $project->images()->whereIn('id', $removeIds)->get();
         foreach ($imagesToRemove as $image) {
-            // Verwijder zowel het fysieke bestand als de databasevermelding.
+            //Bij het verwijderen van een afbeelding wordt zowel het bestand zelf als de bijbehorende databasevermelding verwijderd.
+            //Op deze manier blijven er geen ongebruikte bestanden of verwijzingen naar bestanden die niet meer bestaan achter.
             Storage::disk('public')->delete($image->path);
             $image->delete();
         }
@@ -105,6 +109,7 @@ class ProjectController extends Controller
 
     private function tagsFromInput(string $input): array
     {
+        // Bij het vergelijken van tags wordt geen verschil gemaakt tussen hoofdletters en kleine letters. Hierdoor worden bijvoorbeeld "Laravel" en "laravel" niet als twee verschillende tags gezien.
         return collect(explode(',', $input))
             ->map(fn (string $tag) => trim($tag))
             ->filter()

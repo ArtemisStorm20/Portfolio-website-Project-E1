@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('project_images', function (Blueprint $table) {
             $table->id();
+            //Deze velden worden automatisch ingevuld.
+            //Wanneer een project wordt verwijderd, worden de bijbehorende afbeeldingen ook verwijderd, zodat er geen bestanden achterblijven.
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
             $table->string('path');
             $table->unsignedInteger('sort_order')->default(0);
